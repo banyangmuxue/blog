@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.MessageMapper">
+
+    <select id="countApproved" resultType="long">
+        SELECT COUNT(*)
+        FROM message
+        WHERE status = 'approved'
+    </select>
+
+    <select id="selectApprovedPage" resultType="com.blog.blogbackend.dto.MessageRow">
+        SELECT
+            id,
+            nickname,
+            content,
+            created_at,
+            reply_content,
+            reply_at
+        FROM message
+        WHERE status = 'approved'
+        ORDER BY created_at DESC, id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countRecentByIp" resultType="long">
+        SELECT COUNT(*)
+        FROM message
+        WHERE ip = #{ip}
+          AND created_at &gt;= #{since}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO message
+            (nickname, email, content, status, ip, created_at)
+        VALUES
+            (#{nickname}, #{email}, #{content}, #{status}, #{ip}, #{createdAt})
+    </insert>
+
+</mapper>

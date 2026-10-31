@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.CategoryMapper">
+
+    <select id="selectCategoryList" resultType="com.blog.blogbackend.vo.CategoryVO">
+        SELECT c.slug,
+               c.name,
+               c.description,
+               (SELECT COUNT(*)
+                FROM post p
+                WHERE p.category_id = c.id
+                  AND p.status = 'published') AS count
+        FROM category c
+        ORDER BY c.sort_order ASC, c.id ASC
+    </select>
+
+    <select id="selectIdBySlug" resultType="long">
+        SELECT id
+        FROM category
+        WHERE slug = #{slug}
+        LIMIT 1
+    </select>
+
+</mapper>

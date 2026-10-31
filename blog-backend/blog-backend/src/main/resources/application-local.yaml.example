@@ -1,0 +1,13 @@
+# 复制为 application-local.yaml 后填入本地真实值；application-local.yaml 不会被提交
+spring:
+  datasource:
+    username: root
+    password: "change-me"
+  data:
+    redis:
+      password: "change-me"
+
+blog:
+  admin:
+    username: admin
+    password: "change-me"

@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  # 本地口令放在 application-local.yaml（已 gitignore），部署时用 BLOG_DB_PASSWORD 等环境变量
+  config:
+    import: optional:classpath:application-local.yaml
+  application:
+    name: blog-backend
+  datasource:
+    url: "jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+    username: ${BLOG_DB_USERNAME:root}
+    password: ${BLOG_DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    time-zone: Asia/Shanghai
+  cache:
+    type: redis
+  data:
+    redis:
+      # 本机 Redis 地址，可通过环境变量覆盖
+      host: ${BLOG_REDIS_HOST:localhost}
+      port: ${BLOG_REDIS_PORT:6379}
+      password: ${BLOG_REDIS_PASSWORD:}
+      database: ${BLOG_REDIS_DATABASE:0}
+      timeout: 2s
+      connect-timeout: 2s
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+# 管理后台账号，可通过环境变量覆盖
+blog:
+  admin:
+    username: ${BLOG_ADMIN_USERNAME:admin}
+    password: ${BLOG_ADMIN_PASSWORD:}
+  upload:
+    # 存储类型：local=本地磁盘，oss=阿里云对象存储
+    type: ${BLOG_UPLOAD_TYPE:local}
+    # local 模式的保存目录；oss 模式下也用于继续提供历史本地图片
+    # 相对路径以应用启动目录为基准
+    dir: ${BLOG_UPLOAD_DIR:uploads}
+    oss:
+      endpoint: ${BLOG_OSS_ENDPOINT:}
+      bucket: ${BLOG_OSS_BUCKET:}
+      access-key-id: ${BLOG_OSS_ACCESS_KEY_ID:}
+      access-key-secret: ${BLOG_OSS_ACCESS_KEY_SECRET:}
+      # 可选：自定义域名/CDN，留空则用 bucket + endpoint 自动拼接
+      public-base-url: ${BLOG_OSS_PUBLIC_BASE_URL:}
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.blog.blogbackend.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 开发期打印 Mapper 执行的 SQL，便于排查
+logging:
+  level:
+    com.blog.blogbackend.mapper: debug

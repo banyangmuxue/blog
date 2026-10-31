@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.PostViewMapper">
+
+    <insert id="insertIgnore">
+        INSERT IGNORE INTO post_view
+            (post_id, visitor_key, viewed_at)
+        VALUES
+            (#{postId}, #{visitorKey}, #{viewedAt})
+    </insert>
+
+    <update id="refresh">
+        UPDATE post_view
+        SET viewed_at = #{viewedAt}
+        WHERE post_id = #{postId}
+          AND visitor_key = #{visitorKey}
+          AND viewed_at &lt;= #{threshold}
+    </update>
+
+</mapper>

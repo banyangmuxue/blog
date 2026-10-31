@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.PostMapper">
+
+    <sql id="postColumns">
+        p.id,
+        p.slug,
+        p.title,
+        p.excerpt,
+        p.content,
+        p.cover_from,
+        p.cover_to,
+        p.cover_image,
+        p.views,
+        p.pinned,
+        p.published_at,
+        p.updated_at,
+        c.slug AS category_slug,
+        c.name AS category_name,
+        c.description AS category_description
+    </sql>
+
+    <sql id="listCondition">
+        p.status = 'published'
+        AND p.published_at IS NOT NULL
+        <if test="category != null and category != ''">
+            AND c.slug = #{category}
+        </if>
+        <if test="tag != null and tag != ''">
+            AND EXISTS (
+                SELECT 1
+                FROM post_tag pt
+                JOIN tag t ON t.id = pt.tag_id
+                WHERE pt.post_id = p.id
+                  AND t.slug = #{tag}
+            )
+        </if>
+        <if test="pinned != null">
+            AND p.pinned = #{pinned}
+        </if>
+        <if test="q != null and q != ''">
+            AND (
+                p.title LIKE CONCAT('%', #{q}, '%')
+                OR p.excerpt LIKE CONCAT('%', #{q}, '%')
+                OR p.content LIKE CONCAT('%', #{q}, '%')
+                OR EXISTS (
+                    SELECT 1
+                    FROM post_tag pt
+                    JOIN tag t ON t.id = pt.tag_id
+                    WHERE pt.post_id = p.id
+                      AND t.name LIKE CONCAT('%', #{q}, '%')
+                )
+            )
+        </if>
+    </sql>
+
+    <select id="countPosts" resultType="long">
+        SELECT COUNT(*)
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE
+        <include refid="listCondition"/>
+    </select>
+
+    <select id="selectPostPage" resultType="com.blog.blogbackend.dto.PostRow">
+        SELECT
+        <include refid="postColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE
+        <include refid="listCondition"/>
+        ORDER BY
+        <choose>
+            <when test="q != null and q != ''">
+                CASE WHEN p.title LIKE CONCAT('%', #{q}, '%') THEN 0 ELSE 1 END,
+                p.published_at DESC
+            </when>
+            <when test="sort == 'oldest'">
+                p.published_at ASC
+            </when>
+            <when test="sort == 'views'">
+                p.views DESC, p.published_at DESC
+            </when>
+            <otherwise>
+                p.published_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="selectLatestPosts" resultType="com.blog.blogbackend.dto.PostRow">
+        SELECT
+        <include refid="postColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE p.status = 'published'
+          AND p.published_at IS NOT NULL
+        ORDER BY p.published_at DESC, p.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectBySlug" resultType="com.blog.blogbackend.dto.PostRow">
+        SELECT
+        <include refid="postColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE p.slug = #{slug}
+          AND p.status = 'published'
+          AND p.published_at IS NOT NULL
+        LIMIT 1
+    </select>
+
+    <select id="selectPrevPost" resultType="com.blog.blogbackend.dto.PostRow">
+        SELECT
+        <include refid="postColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE p.status = 'published'
+          AND p.published_at IS NOT NULL
+          AND (p.published_at &lt; #{publishedAt}
+               OR (p.published_at = #{publishedAt} AND p.id &lt; #{id}))
+        ORDER BY p.published_at DESC, p.id DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectArchivePosts" resultType="com.blog.blogbackend.dto.PostRow">
+        SELECT
+        <include refid="postColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE p.status = 'published'
+          AND p.published_at IS NOT NULL
+        ORDER BY p.published_at DESC, p.id DESC
+    </select>
+
+    <update id="incrementViews">
+        UPDATE post
+        SET views = views + 1
+        WHERE id = #{postId}
+    </update>
+
+    <select id="selectNextPost" resultType="com.blog.blogbackend.dto.PostRow">
+        SELECT
+        <include refid="postColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE p.status = 'published'
+          AND p.published_at IS NOT NULL
+          AND (p.published_at &gt; #{publishedAt}
+               OR (p.published_at = #{publishedAt} AND p.id &gt; #{id}))
+        ORDER BY p.published_at ASC, p.id ASC
+        LIMIT 1
+    </select>
+
+</mapper>

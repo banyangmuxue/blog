@@ -1,0 +1,237 @@
+/* 管理后台通用样式，仅在 /admin 页面使用，类名统一以 admin- 开头 */
+
+.admin-container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.admin-page-head {
+  display: flex;
+  margin-bottom: 26px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-page-title {
+  margin-top: 5px;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.admin-page-desc {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.admin-btn {
+  display: inline-flex;
+  padding: 8px 15px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition: border-color 0.16s, background 0.16s, color 0.16s;
+
+  &:hover {
+    border-color: var(--line-strong);
+    background: rgba(125, 211, 252, 0.05);
+    text-decoration: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.primary {
+    border-color: rgba(62, 231, 255, 0.42);
+    background: rgba(62, 231, 255, 0.11);
+    color: var(--cyan);
+
+    &:hover:not(:disabled) {
+      border-color: rgba(62, 231, 255, 0.62);
+      background: rgba(62, 231, 255, 0.17);
+    }
+  }
+
+  &.danger {
+    border-color: rgba(255, 125, 143, 0.3);
+    color: var(--red);
+
+    &:hover:not(:disabled) {
+      border-color: rgba(255, 125, 143, 0.5);
+      background: rgba(255, 125, 143, 0.08);
+    }
+  }
+
+  &.ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--muted);
+
+    &:hover:not(:disabled) {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+    }
+  }
+
+  &.small {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  > span {
+    color: var(--muted);
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+  }
+
+  em {
+    color: var(--faint);
+    font-style: normal;
+    font-size: 11.5px;
+  }
+}
+
+.admin-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  outline: none;
+  background: rgba(6, 9, 15, 0.6);
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 0.16s, box-shadow 0.16s;
+
+  &::placeholder {
+    color: var(--faint);
+  }
+
+  &:focus {
+    border-color: rgba(62, 231, 255, 0.48);
+    box-shadow: 0 0 0 3px rgba(62, 231, 255, 0.07);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+textarea.admin-input {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+select.admin-input {
+  appearance: none;
+  padding-right: 32px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--faint) 50%),
+    linear-gradient(135deg, var(--faint) 50%, transparent 50%);
+  background-position:
+    calc(100% - 17px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px);
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
+  cursor: pointer;
+}
+
+.admin-badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+
+  &.published {
+    border-color: rgba(61, 220, 151, 0.35);
+    background: rgba(61, 220, 151, 0.08);
+    color: var(--green);
+  }
+
+  &.draft {
+    border-color: rgba(245, 196, 81, 0.32);
+    background: rgba(245, 196, 81, 0.08);
+    color: var(--amber);
+  }
+
+  &.approved {
+    border-color: rgba(61, 220, 151, 0.35);
+    background: rgba(61, 220, 151, 0.08);
+    color: var(--green);
+  }
+
+  &.pending {
+    border-color: rgba(245, 196, 81, 0.32);
+    background: rgba(245, 196, 81, 0.08);
+    color: var(--amber);
+  }
+}
+
+.admin-empty {
+  padding: 64px 24px;
+  color: var(--faint);
+  text-align: center;
+
+  strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.admin-error-box {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 125, 143, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 125, 143, 0.06);
+  color: var(--red);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 0 18px;
+  }
+
+  .admin-page-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-page-title {
+    font-size: 24px;
+  }
+}

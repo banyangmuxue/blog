@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.AdminPostMapper">
+
+    <sql id="adminPostColumns">
+        p.id,
+        p.slug,
+        p.title,
+        p.excerpt,
+        p.content,
+        p.cover_from,
+        p.cover_to,
+        p.cover_image,
+        p.views,
+        p.pinned,
+        p.status,
+        p.published_at,
+        p.updated_at,
+        c.slug AS category_slug,
+        c.name AS category_name,
+        c.description AS category_description
+    </sql>
+
+    <sql id="adminCondition">
+        <if test="status != null and status != ''">
+            AND p.status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                p.title LIKE CONCAT('%', #{keyword}, '%')
+                OR p.slug LIKE CONCAT('%', #{keyword}, '%')
+                OR p.excerpt LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+    </sql>
+
+    <select id="countAdminPosts" resultType="long">
+        SELECT COUNT(*)
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE 1 = 1
+        <include refid="adminCondition"/>
+    </select>
+
+    <select id="selectAdminPostPage" resultType="com.blog.blogbackend.dto.AdminPostRow">
+        SELECT
+        <include refid="adminPostColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE 1 = 1
+        <include refid="adminCondition"/>
+        ORDER BY p.updated_at DESC, p.id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="selectAdminPostById" resultType="com.blog.blogbackend.dto.AdminPostRow">
+        SELECT
+        <include refid="adminPostColumns"/>
+        FROM post p
+        LEFT JOIN category c ON c.id = p.category_id
+        WHERE p.id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="countBySlug" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        WHERE slug = #{slug}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insertPost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post (
+            slug, title, excerpt, content, cover_from, cover_to, cover_image,
+            category_id, status, pinned, published_at
+        ) VALUES (
+            #{slug}, #{title}, #{excerpt}, #{content}, #{coverFrom}, #{coverTo}, #{coverImage},
+            #{categoryId}, #{status}, #{pinned}, #{publishedAt}
+        )
+    </insert>
+
+    <update id="updatePost">
+        UPDATE post
+        SET slug = #{slug},
+            title = #{title},
+            excerpt = #{excerpt},
+            content = #{content},
+            cover_from = #{coverFrom},
+            cover_to = #{coverTo},
+            cover_image = #{coverImage},
+            category_id = #{categoryId},
+            status = #{status},
+            pinned = #{pinned},
+            published_at = #{publishedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePostStatus">
+        UPDATE post
+        SET status = #{status},
+            published_at = #{publishedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deletePost">
+        DELETE FROM post
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deletePostTags">
+        DELETE FROM post_tag
+        WHERE post_id = #{postId}
+    </delete>
+
+    <insert id="insertPostTags">
+        INSERT INTO post_tag (post_id, tag_id)
+        VALUES
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{postId}, #{tagId})
+        </foreach>
+    </insert>
+
+    <select id="selectTagSlugsByPostId" resultType="string">
+        SELECT t.slug
+        FROM post_tag pt
+        JOIN tag t ON t.id = pt.tag_id
+        WHERE pt.post_id = #{postId}
+        ORDER BY t.name ASC
+    </select>
+
+</mapper>

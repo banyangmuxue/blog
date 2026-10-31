@@ -1,0 +1,35 @@
+# 依赖与构建产物
+node_modules/
+target/
+dist/
+build/
+*.class
+*.jar
+
+# 运行时数据与用户上传内容
+uploads/
+dump.rdb
+*.rdb
+
+# 本地配置与密钥（含数据库/Redis/后台口令）
+application-local.yaml
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+# IDE 与本机截图
+.idea/
+.vscode/
+.screenshots/
+*.iml
+
+# 系统与日志文件
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.SiteConfigMapper">
+
+    <select id="selectSiteConfig" resultType="com.blog.blogbackend.entity.SiteConfig">
+        SELECT id,
+               name,
+               short_name,
+               logo_text,
+               logo_url,
+               title,
+               subtitle,
+               description,
+               author,
+               announcement,
+               footer_text,
+               icp,
+               founded_at,
+               socials,
+               features_comments,
+               features_review,
+               features_guestbook,
+               features_search
+        FROM site_config
+        WHERE id = 1
+    </select>
+
+    <update id="updateSiteConfig">
+        UPDATE site_config
+        SET name                = #{name},
+            short_name          = #{shortName},
+            logo_text           = #{logoText},
+            logo_url            = #{logoUrl},
+            title               = #{title},
+            subtitle            = #{subtitle},
+            description         = #{description},
+            author              = #{author},
+            announcement        = #{announcement},
+            footer_text         = #{footerText},
+            icp                 = #{icp},
+            founded_at          = #{foundedAt},
+            socials             = #{socials},
+            features_comments   = #{featuresComments},
+            features_review     = #{featuresReview},
+            features_guestbook  = #{featuresGuestbook},
+            features_search     = #{featuresSearch}
+        WHERE id = 1
+    </update>
+
+</mapper>

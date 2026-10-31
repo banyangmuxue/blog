@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.ProfileMapper">
+
+    <select id="selectProfile" resultType="com.blog.blogbackend.entity.Profile">
+        SELECT id,
+               name,
+               avatar_text,
+               avatar_url,
+               bio,
+               skills,
+               socials,
+               joined_at,
+               about
+        FROM profile
+        WHERE id = 1
+    </select>
+
+    <update id="updateProfile">
+        UPDATE profile
+        SET name        = #{name},
+            avatar_text = #{avatarText},
+            avatar_url  = #{avatarUrl},
+            bio         = #{bio},
+            skills      = #{skills},
+            socials     = #{socials},
+            joined_at   = #{joinedAt},
+            about       = #{about}
+        WHERE id = 1
+    </update>
+
+</mapper>

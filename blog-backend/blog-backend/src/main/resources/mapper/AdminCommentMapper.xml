@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.AdminCommentMapper">
+
+    <select id="countByPostId" resultType="long">
+        SELECT COUNT(*)
+        FROM comment
+        WHERE post_id = #{postId}
+    </select>
+
+    <select id="selectPageByPostId" resultType="com.blog.blogbackend.dto.AdminCommentRow">
+        SELECT id,
+               nickname,
+               content,
+               status,
+               created_at
+        FROM comment
+        WHERE post_id = #{postId}
+        ORDER BY created_at DESC, id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM comment
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

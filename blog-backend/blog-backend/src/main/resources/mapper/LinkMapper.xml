@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.LinkMapper">
+
+    <select id="selectVisibleLinks" resultType="com.blog.blogbackend.entity.Link">
+        SELECT
+            id,
+            name,
+            url,
+            domain,
+            avatar_text,
+            description,
+            sort_order,
+            visible
+        FROM link
+        WHERE visible = 1
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+</mapper>

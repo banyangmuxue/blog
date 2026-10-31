@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人博客系统 · 需求文档 v1.0</title>
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#06090f;
+  --bg-1:#0a1018;
+  --panel:#0d1520;
+  --panel-2:#111b29;
+  --line:rgba(125,211,252,.15);
+  --line-strong:rgba(125,211,252,.32);
+  --text:#e8eef7;
+  --muted:#8fa3ba;
+  --faint:#5d7189;
+  --cyan:#3ee7ff;
+  --violet:#8b5cf6;
+  --green:#3ddc97;
+  --amber:#f5c451;
+  --red:#ff7d8f;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,"Courier New",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 560px at 88% -12%, rgba(139,92,246,.17), transparent 62%),
+    radial-gradient(820px 480px at 0% -6%, rgba(62,231,255,.09), transparent 58%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.78;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(125,211,252,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(125,211,252,.035) 1px,transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(circle at 50% 0%,#000 20%,transparent 78%);
+  mask-image:radial-gradient(circle at 50% 0%,#000 20%,transparent 78%);
+}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+::selection{background:rgba(62,231,255,.24)}
+
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,9,15,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1240px;margin:0 auto;padding:11px 28px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:#04121a;font-weight:700}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:11px;font-family:var(--mono);letter-spacing:.06em}
+.topbar .spacer{flex:1}
+.doc-pill{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);padding:4px 9px;border-radius:999px;white-space:nowrap}
+.print-btn{font-family:var(--mono);font-size:11px;color:var(--cyan);border:1px solid rgba(62,231,255,.3);background:rgba(62,231,255,.07);padding:6px 12px;border-radius:8px;cursor:pointer}
+.print-btn:hover{background:rgba(62,231,255,.14)}
+
+.cover{max-width:1240px;margin:0 auto;padding:70px 28px 46px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);gap:56px;align-items:end;position:relative;z-index:1}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(62,231,255,.24);background:rgba(62,231,255,.06);padding:5px 11px;border-radius:999px;margin-bottom:22px}
+.kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+h1{margin:0 0 14px;font-size:clamp(38px,5.2vw,64px);line-height:1.05;letter-spacing:-.035em;font-weight:700}
+h1 em{font-style:normal;background:linear-gradient(100deg,var(--cyan) 10%,#b6a4ff 55%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.cover-sub{margin:0 0 22px;font-size:17px;color:var(--muted);max-width:34em}
+.cover-sub strong{color:var(--text);font-weight:600}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;color:var(--muted);border:1px solid var(--line);padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.02)}
+.chip b{color:var(--text);font-weight:500}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
+
+.terminal{border:1px solid var(--line-strong);border-radius:16px;background:linear-gradient(170deg,rgba(17,27,41,.94),rgba(8,13,20,.96));box-shadow:0 30px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05);overflow:hidden;position:relative}
+.terminal::after{content:"";position:absolute;inset:0;background:radial-gradient(400px 180px at 80% 0%,rgba(62,231,255,.09),transparent 70%);pointer-events:none}
+.term-bar{display:flex;align-items:center;gap:7px;padding:12px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--faint)}
+.dot{width:9px;height:9px;border-radius:50%;background:#2b3b4e}
+.dot.r{background:#ff6b81}.dot.y{background:#f5c451}.dot.g{background:#3ddc97}
+.term-title{margin-left:8px}
+.term-body{padding:20px 18px 22px;font-family:var(--mono);font-size:12.5px;line-height:2;position:relative;z-index:1}
+.term-body .ln{display:flex;gap:12px;white-space:nowrap}
+.term-body .k{color:var(--faint);width:76px;flex:none}
+.term-body .v{color:var(--text)}
+.term-body .v.c{color:var(--cyan)}
+.term-body .v.v{color:#b6a4ff}
+.term-body .prompt{color:var(--green)}
+.blink{display:inline-block;width:7px;height:13px;background:var(--cyan);vertical-align:-2px;animation:blink 1.1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+.doc{max-width:1240px;margin:0 auto;padding:0 28px 100px;display:grid;grid-template-columns:228px minmax(0,1fr);gap:54px;position:relative;z-index:1}
+.toc{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 120px);overflow:auto;padding-right:6px}
+.toc-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--faint);text-transform:uppercase;margin-bottom:12px}
+.toc a{display:block;padding:7px 10px;border-left:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.45;transition:.18s}
+.toc a:hover{color:var(--text);text-decoration:none;background:rgba(255,255,255,.02)}
+.toc a.active{color:var(--cyan);border-left-color:var(--cyan);background:rgba(62,231,255,.06)}
+.toc .sub{padding-left:20px;font-size:11.5px;color:var(--faint)}
+.toc .sub.active{color:var(--cyan)}
+.toc-note{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:11.5px;color:var(--faint);line-height:1.65}
+
+main{min-width:0}
+.doc-section{padding-top:30px;margin-top:54px;border-top:1px solid var(--line)}
+.doc-section:first-child{margin-top:0;padding-top:0;border-top:0}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.12em}
+h2{margin:0;font-size:clamp(22px,2.4vw,28px);line-height:1.25;letter-spacing:-.02em;font-weight:650}
+.lead{color:var(--muted);max-width:52em;margin:10px 0 24px}
+h3{font-size:17px;margin:30px 0 10px;letter-spacing:-.01em}
+h4{font-size:13px;margin:16px 0 6px;color:var(--text)}
+p{margin:10px 0}
+ul,ol{margin:10px 0;padding-left:22px}
+li{margin:5px 0;color:var(--muted)}
+li strong{color:var(--text)}
+li::marker{color:var(--faint)}
+
+.card{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(17,27,41,.6),rgba(10,16,24,.55));padding:20px 22px;margin:16px 0}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mini-card{border:1px solid var(--line);border-radius:12px;background:rgba(17,27,41,.45);padding:16px 18px}
+.mini-card h4{margin:0 0 6px;font-size:13px;color:var(--cyan);font-family:var(--mono);letter-spacing:.04em}
+.mini-card p{margin:0;font-size:13px;color:var(--muted)}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:14px 0;background:rgba(10,16,24,.5)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
+th{background:rgba(125,211,252,.055);color:var(--text);font-weight:600;text-align:left;white-space:nowrap}
+th,td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+td{color:var(--muted)}
+td strong{color:var(--text);font-weight:600}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(255,255,255,.018)}
+.mono{font-family:var(--mono);font-size:12px;color:var(--cyan)}
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);vertical-align:1px;white-space:nowrap}
+.badge.p0{color:var(--green);border-color:rgba(61,220,151,.3);background:rgba(61,220,151,.08)}
+.badge.p1{color:var(--amber);border-color:rgba(245,196,81,.3);background:rgba(245,196,81,.08)}
+.badge.assume{color:var(--violet);border-color:rgba(139,92,246,.36);background:rgba(139,92,246,.1)}
+.badge.tbd{color:var(--red);border-color:rgba(255,125,143,.34);background:rgba(255,125,143,.08)}
+.badge.out{color:var(--faint);border-color:var(--line);background:rgba(255,255,255,.02)}
+
+.callout{border:1px solid rgba(245,196,81,.26);background:linear-gradient(180deg,rgba(245,196,81,.07),rgba(245,196,81,.025));border-radius:12px;padding:16px 18px;margin:16px 0}
+.callout .callout-title{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--amber);margin-bottom:6px;text-transform:uppercase}
+.callout p,.callout li{color:var(--muted);font-size:13px}
+.callout p{margin:4px 0}
+
+.flow{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:16px 0}
+.flow-step{flex:1 1 150px;min-width:150px;border:1px solid var(--line);border-radius:10px;background:rgba(17,27,41,.55);padding:12px 14px;position:relative}
+.flow-step .n{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:.1em}
+.flow-step strong{display:block;font-size:13px;margin:3px 0 2px}
+.flow-step span{font-size:12px;color:var(--muted);line-height:1.55;display:block}
+.flow-arrow{align-self:center;color:var(--faint);font-family:var(--mono);font-size:14px}
+@media(max-width:780px){.flow-arrow{display:none}}
+
+.fr{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(17,27,41,.66),rgba(10,16,24,.62));padding:22px 24px;margin:16px 0}
+.fr-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.fr-id{font-family:var(--mono);font-size:11px;color:var(--cyan);border:1px solid rgba(62,231,255,.28);background:rgba(62,231,255,.07);border-radius:6px;padding:2px 8px}
+.fr-head h3{margin:0;font-size:18px;letter-spacing:-.01em}
+.fr-head .spacer{flex:1}
+.fr p{margin:8px 0;color:var(--muted);font-size:13.5px}
+.fr p strong{color:var(--text)}
+.fr ul{margin:8px 0 12px}
+.fr li{font-size:13.5px}
+.sub-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:14px 0 6px}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px;margin:10px 0 6px}
+.kv>div{border-left:2px solid rgba(125,211,252,.18);padding:2px 0 2px 12px;margin:8px 0}
+.kv .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:2px}
+.kv .v{font-size:13px;color:var(--muted);line-height:1.65}
+.kv .v strong{color:var(--text)}
+
+.qa{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qa-row{display:grid;grid-template-columns:44px 1.1fr 1.4fr;gap:0;border-bottom:1px solid var(--line)}
+.qa-row:last-child{border-bottom:0}
+.qa-row>div{padding:12px 14px;font-size:13px;color:var(--muted)}
+.qa-row .id{font-family:var(--mono);font-size:11px;color:var(--cyan);border-right:1px solid var(--line)}
+.qa-row .q{color:var(--text);border-right:1px solid var(--line)}
+.qa-row.head>div{background:rgba(125,211,252,.05);color:var(--faint);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+
+.footer{max-width:1240px;margin:0 auto;padding:26px 28px 50px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--faint);font-family:var(--mono);font-size:11px}
+
+@media(max-width:980px){
+  .cover{grid-template-columns:1fr;gap:32px;padding-top:52px}
+  .doc{grid-template-columns:1fr;gap:0}
+  .toc{position:static;display:flex;flex-wrap:wrap;gap:4px;max-height:none;padding:14px 0 18px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  .toc-label{width:100%;margin-bottom:4px}
+  .toc a{border-left:0;border:1px solid var(--line);border-radius:7px;padding:5px 9px}
+  .toc a.active{border-color:rgba(62,231,255,.4)}
+  .toc .sub{display:none}
+  .toc-note{display:none}
+}
+@media(max-width:720px){
+  .topbar-inner,.cover,.doc,.footer{padding-left:18px;padding-right:18px}
+  .doc-pill{display:none}
+  .grid-2,.grid-3,.kv{grid-template-columns:1fr}
+  .qa-row{grid-template-columns:36px 1fr}
+  .qa-row .a{grid-column:1 / -1;border-top:1px dashed var(--line)}
+}
+@media print{
+  body{background:#fff;color:#111}
+  body::before,.topbar,.toc,.print-btn{display:none}
+  .cover,.doc,.footer{max-width:none;padding:0 12px;display:block}
+  .terminal{background:#fff;border-color:#ddd}
+  .term-body{color:#111}
+  .term-body .k,.term-body .v,.term-body .v.c,.term-body .v.v{color:#111}
+  .doc-section{page-break-inside:avoid}
+  .fr,.card,.mini-card,.table-wrap,.callout{background:#fff;border-color:#ddd;break-inside:avoid}
+  h1 em,.kicker,.sec-num,.fr-id,.mono,.qa-row .id{color:#0b6e7a;-webkit-text-fill-color:initial}
+  td,th,.lead,li,p,.kv .v,.mini-card p{color:#333}
+  a{color:#0b6e7a}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="logo">B/</span>
+      <span>个人博客系统<small>PERSONAL BLOG · PRD</small></span>
+    </div>
+    <div class="spacer"></div>
+    <span class="doc-pill">v1.0 · 2026-10-30 · 待评审</span>
+    <button class="print-btn" onclick="window.print()">导出 PDF</button>
+  </div>
+</div>
+
+<header class="cover">
+  <div>
+    <div class="kicker">Product Requirements · v1.0</div>
+    <h1>个人博客系统<br><em>需求文档</em></h1>
+    <p class="cover-sub">一个<strong>前台完全匿名浏览、后台单管理员维护</strong>的个人内容站点。以文章为核心，提供分类、标签、搜索、归档四条找内容的路径，并通过先审后发的评论与留言机制，让作者掌控公开内容。</p>
+    <div class="meta-row">
+      <span class="chip"><span class="chip-dot"></span>前台免登录</span>
+      <span class="chip">后台<b>单管理员</b></span>
+      <span class="chip">评论<b>先审后发</b></span>
+      <span class="chip">形态<b>Web 站点</b></span>
+      <span class="chip">技术约束<b>Vue 3 + Spring Boot</b></span>
+    </div>
+  </div>
+  <div class="terminal" aria-label="产品摘要">
+    <div class="term-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="term-title">~/blog — product status</span>
+    </div>
+    <div class="term-body">
+      <div class="ln"><span class="k">scope</span><span class="v">前台匿名浏览 · 后台单管理员</span></div>
+      <div class="ln"><span class="k">content</span><span class="v c">文章 · 分类 · 标签 · 归档</span></div>
+      <div class="ln"><span class="k">discover</span><span class="v c">关键词搜索 · 分类/标签筛选</span></div>
+      <div class="ln"><span class="k">engage</span><span class="v v">评论 · 留言板 · 先审后发</span></div>
+      <div class="ln"><span class="k">profile</span><span class="v">关于我 · 友链 · 站点配置</span></div>
+      <div class="ln"><span class="k">excluded</span><span class="v">读者账号 · 多作者 · 付费阅读</span></div>
+      <div class="ln"><span class="k">status</span><span class="v c">P0 READY FOR REVIEW</span></div>
+      <div class="ln"><span class="prompt">$</span><span class="v"><span class="blink"></span></span></div>
+    </div>
+  </div>
+</header>
+
+<div class="doc">
+  <nav class="toc" aria-label="目录">
+    <div class="toc-label">Contents</div>
+    <a href="#s1">01 背景与目标</a>
+    <a href="#s2">02 范围与优先级</a>
+    <a href="#s3">03 角色与产品模型</a>
+    <a href="#s3-article" class="sub">文章模型与状态</a>
+    <a href="#s3-comment" class="sub">评论/留言状态</a>
+    <a href="#s3-perm" class="sub">权限矩阵</a>
+    <a href="#s3-flow" class="sub">核心流程</a>
+    <a href="#s4">04 功能需求</a>
+    <a href="#s4-front" class="sub">前台模块 FR-01—FR-09</a>
+    <a href="#s4-admin" class="sub">后台模块 FR-10—FR-18</a>
+    <a href="#s5">05 共享规则与异常</a>
+    <a href="#s6">06 开放问题</a>
+    <div class="toc-note">配套文档：<br>《个人博客原型说明书》<br>用于页面布局、组件与交互规格对齐。</div>
+  </nav>
+
+  <main>
+    <!-- ===================== 01 ===================== -->
+    <section class="doc-section" id="s1">
+      <div class="sec-head"><span class="sec-num">01</span><h2>背景与目标</h2></div>
+      <p class="lead">作者需要一个不被平台格式与算法限制、可长期积累的内容阵地。访客进入博客时通常只有两个目标：找到某个主题的文章，或随意浏览近期内容。当前个人博客常见的问题是只有一条时间线列表，旧文章无法被再次找到，站点信息与友链每次调整都要改代码，评论区也缺少可控的公开机制。</p>
+
+      <div class="grid-2">
+        <div class="mini-card">
+          <h4>问题 → 产品回应</h4>
+          <p>内容沉不下去 → 分类、标签、搜索、归档四条检索路径；互动不可控 → 评论与留言先审后发；维护依赖开发 → 文章、分类标签、友链、站点信息全部后台化。</p>
+        </div>
+        <div class="mini-card">
+          <h4>产品边界</h4>
+          <p>前台不建立读者账号体系，阅读、评论、留言均为匿名行为；后台仅一个管理员账号，不引入多作者与角色权限。</p>
+        </div>
+      </div>
+
+      <h3>期望的可观察结果</h3>
+      <ul>
+        <li>访客不登录即可读完任意已发布文章，并能从<strong>分类、标签、搜索、归档</strong>四种入口重新回到文章。</li>
+        <li>作者可在后台完成文章从草稿、发布、下线到再发布的完整生命周期，无需修改代码或数据库。</li>
+        <li>读者提交的评论与留言<strong>不会立即公开</strong>，只有作者审核通过后才出现在前台。</li>
+        <li>站点名称、公告、关于我、友链、社交链接可由后台修改，前台下次加载即可看到新内容。</li>
+        <li>访客在移动端与桌面端都能完成阅读和评论，不出现横向滚动或操作入口丢失。</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-title">Default assumptions / 本文默认假设</div>
+        <p>单管理员（作者本人）；评论审核默认开启且可在站点配置中关闭；评论与留言提交需轻量人机校验与频率限制；图片与头像单文件不超过 2MB；阅读量按文章详情页加载计数。以上均待第 06 节确认。</p>
+      </div>
+    </section>
+
+    <!-- ===================== 02 ===================== -->
+    <section class="doc-section" id="s2">
+      <div class="sec-head"><span class="sec-num">02</span><h2>范围与优先级</h2></div>
+      <p class="lead">P0 只覆盖两条最小完整旅程：访客找到并读完文章、留下一条可被审核的评论；作者登录后发布一篇文章并处理一条评论。所有 P0 模块都为这两条旅程服务。</p>
+
+      <h3>角色</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>角色</th><th>身份</th><th>可以做什么</th><th>不能做什么</th></tr></thead>
+          <tbody>
+            <tr><td><strong>访客</strong></td><td>未登录的任何人</td><td>浏览已发布文章、分类、标签、搜索结果、归档、关于我、友链、留言板；提交评论与留言；下载文章附件（P1）</td><td>不能查看草稿、已下线文章、待审核评论/留言；不能进入后台；不能编辑或删除自己提交的内容</td></tr>
+            <tr><td><strong>管理员</strong></td><td>唯一账号，即作者本人</td><td>登录后台；管理文章、分类、标签、评论、留言、友链、站点配置与个人资料</td><td>不存在读者账号；不引入多作者、审核员等第二角色</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>P0 旅程</h3>
+      <div class="flow">
+        <div class="flow-step"><span class="n">VISITOR / 01</span><strong>进入站点</strong><span>首页或直接打开文章链接</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">VISITOR / 02</span><strong>找到内容</strong><span>分类、标签、搜索或归档筛选</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">VISITOR / 03</span><strong>阅读详情</strong><span>正文、目录、上下篇、评论</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">VISITOR / 04</span><strong>提交评论</strong><span>匿名填写，等待审核</span></div>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><span class="n">AUTHOR / 01</span><strong>登录后台</strong><span>唯一管理员账号</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">AUTHOR / 02</span><strong>新建文章</strong><span>标题、正文、分类、标签</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">AUTHOR / 03</span><strong>保存 / 预览</strong><span>草稿可继续编辑</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">AUTHOR / 04</span><strong>发布</strong><span>前台首页与列表可见</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">AUTHOR / 05</span><strong>审核评论</strong><span>通过 / 驳回 / 回复</span></div>
+      </div>
+
+      <h3>P0 功能清单</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>模块</th><th>覆盖的旅程</th><th>关键产出</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">FR-01</td><td>首页</td><td>访客进入</td><td>站点第一印象、置顶与最新文章、分类入口</td></tr>
+            <tr><td class="mono">FR-02</td><td>文章列表与详情</td><td>访客阅读</td><td>分页列表、Markdown 正文、目录、上下篇</td></tr>
+            <tr><td class="mono">FR-03</td><td>分类与标签</td><td>访客检索</td><td>按分类/标签聚合的文章列表</td></tr>
+            <tr><td class="mono">FR-04</td><td>搜索</td><td>访客检索</td><td>标题、摘要、正文、标签的关键词匹配</td></tr>
+            <tr><td class="mono">FR-05</td><td>归档</td><td>访客检索</td><td>按年月分组的文章索引</td></tr>
+            <tr><td class="mono">FR-06</td><td>文章评论</td><td>访客互动</td><td>匿名提交、审核中反馈、博主回复</td></tr>
+            <tr><td class="mono">FR-07</td><td>关于我</td><td>访客了解作者</td><td>头像、简介、技能、社交链接、长文</td></tr>
+            <tr><td class="mono">FR-08</td><td>友链</td><td>访客发现</td><td>外链卡片列表</td></tr>
+            <tr><td class="mono">FR-09</td><td>留言板</td><td>访客互动</td><td>独立于文章的匿名留言</td></tr>
+            <tr><td class="mono">FR-10</td><td>后台登录</td><td>作者进入</td><td>单账号登录、会话失效、退出</td></tr>
+            <tr><td class="mono">FR-11</td><td>仪表盘</td><td>作者概览</td><td>内容统计、待审核数量、快捷操作</td></tr>
+            <tr><td class="mono">FR-12</td><td>文章管理</td><td>作者发布</td><td>列表、新建、编辑、预览、发布、下线、删除</td></tr>
+            <tr><td class="mono">FR-13</td><td>分类与标签管理</td><td>作者发布</td><td>分类/标签的增删改与文章迁移约束</td></tr>
+            <tr><td class="mono">FR-14</td><td>评论审核</td><td>作者审核</td><td>通过、驳回、回复、删除</td></tr>
+            <tr><td class="mono">FR-15</td><td>留言管理</td><td>作者审核</td><td>留言的审核与回复</td></tr>
+            <tr><td class="mono">FR-16</td><td>友链管理</td><td>作者维护</td><td>友链增删改、排序与显隐</td></tr>
+            <tr><td class="mono">FR-17</td><td>站点配置</td><td>作者维护</td><td>站点信息、开关、社交链接、页脚</td></tr>
+            <tr><td class="mono">FR-18</td><td>个人资料</td><td>作者维护</td><td>关于我资料、修改密码</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>P1 与明确不做</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4>P1 · 后续迭代</h4>
+          <ul>
+            <li>RSS 与邮件订阅（含退订）</li>
+            <li>文章附件上传与免登录下载、下载次数</li>
+            <li>友链自助申请与失效链接检测</li>
+            <li>评论/留言邮件通知、评论批量审核</li>
+            <li>文章自动保存、回收站、标签合并</li>
+            <li>访问统计、热门文章排序</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>不做 · 本期排除</h4>
+          <ul>
+            <li>读者注册、登录、收藏、关注、私信</li>
+            <li>多作者、多角色与细粒度权限</li>
+            <li>付费阅读、广告、电商、打赏</li>
+            <li>原生 App、小程序、桌面客户端</li>
+            <li>推荐算法、全文检索集群、多语言站点</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 03 ===================== -->
+    <section class="doc-section" id="s3">
+      <div class="sec-head"><span class="sec-num">03</span><h2>角色与产品模型</h2></div>
+      <p class="lead">全站以“文章”为主对象，分类、标签、评论围绕文章组织；留言板、友链、站点配置是独立对象。所有模块的可见性只由“内容状态”和“角色”两个维度决定。</p>
+
+      <h3>对象与关系</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>对象</th><th>定义</th><th>关键属性</th><th>关系</th></tr></thead>
+          <tbody>
+            <tr><td><strong>文章</strong></td><td>一篇可发布的 Markdown 内容</td><td>标题、slug、摘要、正文、封面、状态、置顶、允许评论、发布时间、浏览量</td><td>属于 1 个分类；拥有 0—5 个标签；拥有多条评论</td></tr>
+            <tr><td><strong>分类</strong></td><td>文章的一级归类，前台导航入口</td><td>名称、slug、描述、排序</td><td>1 个分类包含多篇文章；有文章时不可删除</td></tr>
+            <tr><td><strong>标签</strong></td><td>文章的主题标记，可多选</td><td>名称、slug</td><td>与文章多对多；删除标签仅解除关联</td></tr>
+            <tr><td><strong>评论</strong></td><td>访客针对某篇文章的匿名发言</td><td>昵称、邮箱（不公开）、内容、状态、博主回复</td><td>必须属于一篇已发布文章；文章删除时一并删除</td></tr>
+            <tr><td><strong>留言</strong></td><td>访客在留言板发布的独立内容</td><td>昵称、邮箱（不公开）、内容、状态、博主回复</td><td>不关联文章；文章删除不影响留言</td></tr>
+            <tr><td><strong>友链</strong></td><td>作者维护的外部站点链接</td><td>名称、URL、描述、头像、排序、显示状态</td><td>独立列表；前台只展示显示状态</td></tr>
+            <tr><td><strong>站点配置</strong></td><td>全站唯一的站点级设置</td><td>站点信息、公告、功能开关、社交链接、页脚</td><td>单例，所有前台页面读取</td></tr>
+            <tr><td><strong>管理员</strong></td><td>唯一后台账号</td><td>用户名、密码、作者资料</td><td>单账号；拥有全部后台权限</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s3-article">文章字段与状态</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>字段</th><th>规则</th><th>默认 / 说明</th></tr></thead>
+          <tbody>
+            <tr><td>标题</td><td>必填，2—80 字</td><td>列表与详情的主标题</td></tr>
+            <tr><td>Slug</td><td>选填，2—80 字符，全站唯一</td><td>为空时自动生成；冲突时自动追加序号</td></tr>
+            <tr><td>摘要</td><td>≤200 字</td><td>为空时取正文纯文本前 120 字</td></tr>
+            <tr><td>正文</td><td>Markdown；发布时必填，草稿可为空</td><td>支持代码块、图片、表格、目录</td></tr>
+            <tr><td>封面</td><td>jpg / png / webp，≤2MB，选填</td><td>为空时列表卡片使用纯色占位</td></tr>
+            <tr><td>分类</td><td>必选 1 个；草稿保存时可暂不选择</td><td>发布前必须补全</td></tr>
+            <tr><td>标签</td><td>0—5 个，每个 2—20 字</td><td>超出数量时阻止保存并提示</td></tr>
+            <tr><td>状态</td><td>草稿 / 已发布 / 已下线</td><td>新建默认草稿</td></tr>
+            <tr><td>置顶</td><td>是 / 否</td><td>首页最多展示 3 篇置顶</td></tr>
+            <tr><td>允许评论</td><td>是 / 否，默认是</td><td>关闭后既有评论保留，仅禁止新提交</td></tr>
+            <tr><td>发布时间</td><td>首次发布时写入</td><td>下线后再发布不改变首次发布时间</td></tr>
+            <tr><td>更新时间</td><td>每次保存时更新</td><td>后台列表默认按更新时间倒序</td></tr>
+            <tr><td>浏览量</td><td>非负整数</td><td>详情页加载计数<span class="badge assume">假设</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>文章状态机</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>状态</th><th>前台可见</th><th>可编辑</th><th>可操作</th><th>评论</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge">草稿</span></td><td>否（直接访问返回 404）</td><td>是</td><td>编辑、预览、发布、删除</td><td>不展示评论区</td></tr>
+            <tr><td><span class="badge p0">已发布</span></td><td>是</td><td>是</td><td>编辑、下线、置顶、删除</td><td>按文章的“允许评论”开关执行</td></tr>
+            <tr><td><span class="badge p1">已下线</span></td><td>否（直接访问返回 404）</td><td>是</td><td>编辑、重新发布、删除</td><td>评论保留，重新发布后恢复展示</td></tr>
+            <tr><td><span class="badge out">已删除</span></td><td>否</td><td>否</td><td>不可恢复</td><td>评论一并删除</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>状态流转：草稿 → 发布 → 已发布 → 下线 → 已下线 → 再发布 → 已发布。任意状态均可删除，删除为不可逆操作，必须二次确认并展示将被一并删除的评论数量。</p>
+
+      <h3 id="s3-comment">评论与留言状态</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>状态</th><th>前台公开列表</th><th>后台列表</th><th>作者可执行操作</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge p1">待审核</span></td><td>不展示；提交者仅看到“审核中”提示</td><td>展示</td><td>通过、驳回、删除</td></tr>
+            <tr><td><span class="badge p0">已通过</span></td><td>展示</td><td>展示</td><td>驳回、回复、删除</td></tr>
+            <tr><td><span class="badge out">已驳回</span></td><td>不展示</td><td>展示</td><td>改为通过、删除</td></tr>
+            <tr><td><span class="badge out">已删除</span></td><td>不展示</td><td>不展示（不可恢复）</td><td>无</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>审核开关默认开启；关闭后新提交内容直接进入“已通过”，存量待审核内容不会自动通过。</li>
+        <li>博主回复只针对“已通过”的评论/留言；回复不触发再次审核，前台以“博主”标识展示。</li>
+        <li>评论与留言的内容仅按纯文本展示，不解析 HTML；昵称可重复，邮箱永不公开。</li>
+        <li>匿名访客没有身份凭证，因此不能编辑或撤销自己提交的评论与留言；如需删除需联系作者。</li>
+      </ul>
+
+      <h3 id="s3-perm">权限矩阵</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>区域 / 动作</th><th>访客</th><th>管理员</th></tr></thead>
+          <tbody>
+            <tr><td>首页、文章列表、已发布文章详情</td><td>可访问</td><td>可访问</td></tr>
+            <tr><td>草稿、已下线文章</td><td>不可访问（404）</td><td>可预览、可编辑</td></tr>
+            <tr><td>分类页、标签页、搜索结果、归档、关于我、友链</td><td>可访问</td><td>可访问</td></tr>
+            <tr><td>待审核 / 已驳回的评论与留言</td><td>不可见</td><td>可见、可审核</td></tr>
+            <tr><td>提交评论、留言</td><td>可（受开关与频率限制）</td><td>可</td></tr>
+            <tr><td>下载文章附件（P1）</td><td>可</td><td>可</td></tr>
+            <tr><td>后台全部页面</td><td>不可访问，跳转登录</td><td>可访问</td></tr>
+            <tr><td>文章、分类标签、友链、站点配置、个人资料</td><td>不可操作</td><td>可增删改查</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="s3-flow">核心流程</h3>
+      <h4>访客阅读并评论</h4>
+      <div class="flow">
+        <div class="flow-step"><span class="n">01</span><strong>发现</strong><span>首页/分类/标签/搜索/归档</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">02</span><strong>阅读</strong><span>详情页正文、目录、上下篇</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">03</span><strong>填写</strong><span>昵称、内容、校验</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">04</span><strong>提交</strong><span>提示“审核通过后展示”</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">05</span><strong>作者审核</strong><span>通过后访客可见</span></div>
+      </div>
+      <h4>作者发布文章</h4>
+      <div class="flow">
+        <div class="flow-step"><span class="n">01</span><strong>新建</strong><span>标题 + 正文，默认草稿</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">02</span><strong>完善</strong><span>分类、标签、封面、摘要</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">03</span><strong>预览</strong><span>按前台样式查看</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">04</span><strong>发布</strong><span>校验必填后写入发布时间</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">05</span><strong>可见</strong><span>首页、列表、搜索、归档同步</span></div>
+      </div>
+      <h4>评论审核</h4>
+      <div class="flow">
+        <div class="flow-step"><span class="n">01</span><strong>待审核</strong><span>仪表盘与列表显示数量</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">02</span><strong>阅读内容</strong><span>昵称、正文、所属文章</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">03</span><strong>决策</strong><span>通过 / 驳回 / 删除</span></div><span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="n">04</span><strong>结果</strong><span>通过即公开；可继续回复</span></div>
+      </div>
+    </section>
+
+    <!-- ===================== 04 ===================== -->
+    <section class="doc-section" id="s4">
+      <div class="sec-head"><span class="sec-num">04</span><h2>功能需求</h2></div>
+      <p class="lead">每个模块给出目的、触发条件、处理规则、结果与异常。跨模块复用的校验、排序、删除、防滥用规则统一收敛在第 05 节，模块内只引用不重复定义。</p>
+
+      <h3 id="s4-front">前台模块 · FR-01—FR-09</h3>
+
+      <article class="fr" id="fr-01">
+        <div class="fr-head"><span class="fr-id">FR-01</span><h3>首页</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">访客首次进入时，在首屏判断站点是否有自己需要的内容，并进入文章或检索入口。</span></div>
+          <div><span class="k">Trigger</span><span class="v">访客打开站点根路径，或从外部链接进入首页。</span></div>
+        </div>
+        <div class="sub-label">Layout</div>
+        <p>顶部导航；Hero 区（站点名、副标题、一句话简介、搜索框、主按钮“浏览文章”）；可选公告条；置顶文章区（最多 3 篇）；最新文章区（6 篇，双列卡片）；分类快捷入口（最多 6 个）；作者卡片（头像、昵称、简介、“关于我”入口）；页脚。</p>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>只展示“已发布”文章；草稿、已下线不出现在任何区块。</li>
+          <li>置顶文章按置顶顺序展示，最多 3 篇；没有置顶时隐藏整个置顶区，不显示空占位。</li>
+          <li>最新文章按首次发布时间倒序，最多 6 篇；不足 6 篇按实际数量展示。</li>
+          <li>分类按后台排序值升序，只展示包含已发布文章的分类，最多 6 个。</li>
+          <li>站点名称、副标题、简介、公告来自站点配置；字段为空时隐藏对应模块，不显示空标签。</li>
+          <li>搜索框去除首尾空格后非空才可提交，回车或点击按钮跳转搜索结果页。</li>
+          <li>公告支持关闭，关闭状态只保留在当前浏览会话，不写入服务端。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>访客可以进入任意文章、分类页、搜索页、关于我页面；页面无死链，首屏在 768px 高度内可见主标题与至少一篇内容入口。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>文章区块加载失败：该区块显示错误提示与“重试”，其他区块正常展示。</li>
+          <li>全站没有已发布文章：最新文章区显示空态“还没有文章”，并提供“关于我”入口；不展示后台入口。</li>
+          <li>站点配置暂不可用：使用默认站点名“我的博客”和默认简介，页面不白屏。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-02">
+        <div class="fr-head"><span class="fr-id">FR-02</span><h3>文章列表与详情</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">提供全量已发布文章的时间线浏览，并让访客在详情页完成一次完整阅读。</span></div>
+          <div><span class="k">Trigger</span><span class="v">点击导航“文章”、首页“浏览文章”、分类/标签/搜索结果、归档条目或上一篇/下一篇。</span></div>
+        </div>
+        <div class="sub-label">Article list</div>
+        <ul>
+          <li>入口 <span class="mono">/articles</span>；每页 10 篇，按首次发布时间倒序。</li>
+          <li>卡片包含封面、标题、摘要、分类、标签、发布时间、浏览量；封面缺失时使用纯色几何占位。</li>
+          <li>列表右侧提供分类、标签、归档入口；移动端收进筛选抽屉。</li>
+          <li>分页显示上一页、页码、下一页；只有一页时隐藏分页。</li>
+        </ul>
+        <div class="sub-label">Article detail</div>
+        <ul>
+          <li>入口 <span class="mono">/post/:slug</span>；展示标题、发布时间、更新时间（有更新时）、浏览量、分类、标签、封面、Markdown 正文。</li>
+          <li>正文支持代码高亮与“复制代码”、图片点击放大、表格横向滚动、外链新窗口打开。</li>
+          <li>正文包含至少 3 个二级标题时，桌面端显示文章目录；目录随滚动高亮当前章节。</li>
+          <li>正文后展示上一篇/下一篇（按发布时间相邻），再往下是评论区。</li>
+          <li>浏览量在详情页加载时计数；同一访客对同一文章 30 分钟内重复加载不重复计数。<span class="badge assume">假设</span></li>
+          <li>文章关闭评论时，既有已通过评论仍展示，只隐藏评论表单并提示“本文评论已关闭”。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>访客能完整阅读正文并通过目录跳转章节；从列表、搜索、分类、标签、归档任意入口进入详情后都可返回原入口。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>文章不存在、为草稿或已下线：统一返回 404 页面，提供“返回文章列表”。</li>
+          <li>正文加载失败：显示错误提示与重试，不展示半截正文。</li>
+          <li>图片加载失败：显示占位图与替代文本，不撑破版式。</li>
+          <li>摘要或封面缺失：使用自动摘要与几何占位，不出现空白卡片。</li>
+          <li>评论区加载失败：正文正常展示，评论区单独提示重试。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-03">
+        <div class="fr-head"><span class="fr-id">FR-03</span><h3>分类与标签</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">让访客按主题而不是按时间重新组织文章，解决旧文章沉底问题。</span></div>
+          <div><span class="k">Trigger</span><span class="v">点击首页分类入口、文章卡片上的分类/标签、导航“分类”、标签云或侧栏分类列表。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>分类页 <span class="mono">/categories/:slug</span>：展示分类名称、描述、已发布文章数、文章列表（每页 10 篇）与分页。</li>
+          <li>标签页 <span class="mono">/tags/:slug</span>：展示标签名称、已发布文章数、文章列表与分页；<span class="mono">/tags</span> 展示全部标签云。</li>
+          <li>一篇文章只能属于 1 个分类，可有 0—5 个标签；分类与标签名称 2—20 字且不可重名。</li>
+          <li>前台只展示包含已发布文章的分类与标签；只有草稿的分类不出现在任何前台入口。</li>
+          <li>分类被删除前，其下文章数（含草稿）必须为 0；标签被删除时自动从所有文章解除关联。</li>
+          <li>分类/标签不存在时返回 404；存在但无已发布文章时展示空态“该分类下暂无文章”。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>访客可通过分类或标签连续浏览同主题文章，分页与排序规则与文章列表一致。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>分类页文章加载失败：显示区块错误与重试，分类标题与描述仍展示。</li>
+          <li>标签被删除后旧链接访问：返回 404，并提供标签总览入口。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-04">
+        <div class="fr-head"><span class="fr-id">FR-04</span><h3>搜索</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">访客记得关键词但记不住标题或时间时，仍能快速定位文章。</span></div>
+          <div><span class="k">Trigger</span><span class="v">顶部导航搜索按钮、首页搜索框或搜索结果页搜索框提交关键词。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>关键词去除首尾空格后长度 1—50 字；为空时提示“请输入关键词”，不发起搜索；超过 50 字提示缩短关键词。</li>
+          <li>匹配范围：标题、摘要、正文纯文本、标签名称；不区分英文大小写；特殊字符按普通文本处理，不支持引号、AND/OR 等高级语法。</li>
+          <li>排序：标题命中优先，其次按首次发布时间倒序；同篇文章只出现一次。</li>
+          <li>结果项展示标题（关键词高亮）、摘要片段（命中位置前后各 40 字）、分类、发布时间；正文命中但摘要未命中时，摘要替换为命中片段。</li>
+          <li>只搜索已发布文章；草稿、已下线、待审核评论不进入搜索范围。</li>
+          <li>每页 10 条，显示结果总数与当前关键词。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>搜索页 <span class="mono">/search?q=关键词</span> 展示结果列表；点击结果进入对应文章详情。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>无结果：展示空态“没有找到相关文章”，附最新 3 篇文章与分类入口。</li>
+          <li>关键词为空：展示搜索说明、热门标签与最新文章，不显示结果列表。</li>
+          <li>搜索失败：保留关键词与输入框内容，提示“搜索失败，请重试”。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-05">
+        <div class="fr-head"><span class="fr-id">FR-05</span><h3>归档</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">为按时间回看的访客提供按月索引，形成博客的“年轮”。</span></div>
+          <div><span class="k">Trigger</span><span class="v">点击导航“归档”、首页归档入口或文章列表侧栏归档。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>归档页 <span class="mono">/archive</span>：按年份倒序分组，年份内按月份倒序分组。</li>
+          <li>每个年份显示文章总数；每个月显示月份与文章数；文章行显示日期与标题。</li>
+          <li>默认展开最近一个有文章的年份，其余折叠；点击年份或月份标题展开/收起。</li>
+          <li>展开状态只保留在当前浏览会话，不写入服务端。</li>
+          <li>只展示已发布文章；发布时间缺失的异常数据不出现在归档。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>访客可在一页内看到全部文章的时间分布，并直接进入任意文章。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>没有已发布文章：显示空态“暂无归档内容”，并提供最新文章入口。</li>
+          <li>归档加载失败：显示错误提示与重试。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-06">
+        <div class="fr-head"><span class="fr-id">FR-06</span><h3>文章评论</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">让访客无需注册即可对文章表达观点，同时保证公开内容经过作者审核。</span></div>
+          <div><span class="k">Trigger</span><span class="v">访客在已发布且允许评论的文章详情页底部填写并提交评论。</span></div>
+        </div>
+        <div class="sub-label">Display</div>
+        <ul>
+          <li>仅展示“已通过”的评论，按提交时间正序（旧→新）；显示楼层号、昵称、默认几何头像、时间、内容。</li>
+          <li>博主回复嵌套在原评论下方，标识“博主”，可多条，按时间正序。</li>
+          <li>邮箱不展示；评论内容按纯文本渲染，保留换行，不解析 HTML 与 Markdown。</li>
+          <li>评论数只统计“已通过”的评论。</li>
+        </ul>
+        <div class="sub-label">Form & rules</div>
+        <ul>
+          <li>昵称必填，2—20 字；邮箱选填，格式校验，不公开，仅用于 P1 回复通知；内容必填，5—500 字。</li>
+          <li>提交前需完成一次轻量人机校验；同一浏览器 60 秒内只能提交一次，同一 IP 10 分钟内最多 3 条。<span class="badge assume">假设</span></li>
+          <li>审核开启时，提交成功提示“评论已提交，审核通过后展示”；审核关闭时立即展示并滚动定位到新评论。</li>
+          <li>提交失败时保留昵称、邮箱与内容，仅在内容区下方展示错误原因。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>评论进入待审核列表（或直接通过），仪表盘待审核数 +1；访客看到明确的审核中反馈，不会误以为评论已公开。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>文章关闭评论：隐藏表单，展示“本文评论已关闭”；已有已通过评论照常展示。</li>
+          <li>文章已下线或被删除：详情页 404，评论区不可见。</li>
+          <li>人机校验失败：提示重新完成校验，内容保留。</li>
+          <li>触发频率限制：提示“提交过于频繁，请稍后再试”，按钮进入倒计时不可用。</li>
+          <li>内容仅含空白或超长：阻止提交并在字段下方提示字数要求。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-07">
+        <div class="fr-head"><span class="fr-id">FR-07</span><h3>关于我</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">让访客了解作者身份、关注领域与联系方式，建立对站点的信任。</span></div>
+          <div><span class="k">Trigger</span><span class="v">点击导航“关于”、首页作者卡片或页脚关于链接。</span></div>
+        </div>
+        <div class="sub-label">Layout & rules</div>
+        <ul>
+          <li>页面 <span class="mono">/about</span>：头像、昵称、一句话简介、技能标签、社交链接、Markdown 长文、建站日期。</li>
+          <li>头像、昵称、简介、技能、长文来自个人资料；社交链接与建站日期来自站点配置。</li>
+          <li>技能标签最多 8 个，每个 2—12 字；无数据时隐藏该组。</li>
+          <li>社交链接只允许 http/https，前台新窗口打开；无链接时隐藏链接组。</li>
+          <li>长文使用与文章正文相同的 Markdown 渲染规则。</li>
+          <li>所有字段都为空时展示默认文案“这个作者还没有填写介绍”。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>访客能看到作者的完整介绍与可点击的外部联系方式；页面无内容时也不出现空白板块。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>资料加载失败：显示默认文案与重试入口，页面不白屏。</li>
+          <li>头像加载失败：显示昵称首字母占位头像。</li>
+          <li>链接格式非法：后台保存时阻止，前台不出现不可点击文本。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-08">
+        <div class="fr-head"><span class="fr-id">FR-08</span><h3>友链</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">展示作者认可的站点，形成博客之间的互相导流。</span></div>
+          <div><span class="k">Trigger</span><span class="v">点击导航“友链”或页脚友链入口。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>页面 <span class="mono">/links</span>：卡片网格，每项展示头像、名称、描述、站点地址。</li>
+          <li>只展示“显示”状态的友链；按排序值升序，排序值相同按创建时间升序。</li>
+          <li>点击卡片新窗口打开目标站点，并使用安全的窗口打开属性。</li>
+          <li>友链新增、编辑、排序、显隐全部由后台维护；P0 不提供访客自助申请。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>访客能看到作者维护的全部公开友链，并按顺序浏览。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>无公开友链：展示空态“还没有添加友链”与邀请说明，不显示空网格。</li>
+          <li>友链头像加载失败：显示名称首字母占位。</li>
+          <li>友链加载失败：显示错误提示与重试。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-09">
+        <div class="fr-head"><span class="fr-id">FR-09</span><h3>留言板</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">提供不依附于具体文章的匿名交流空间，适合问候、建议与站务反馈。</span></div>
+          <div><span class="k">Trigger</span><span class="v">点击导航“留言板”，填写昵称、邮箱与内容并提交。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>页面 <span class="mono">/guestbook</span>：顶部说明（欢迎留言、审核说明）、留言表单、留言列表。</li>
+          <li>昵称 2—20 字必填；邮箱选填且不公开；内容 5—300 字必填；提交前完成轻量人机校验。</li>
+          <li>留言与文章评论是独立对象，共用审核状态、频率限制与博主回复规则。</li>
+          <li>留言列表按提交时间倒序，只展示“已通过”内容；博主回复展示在留言下方。</li>
+          <li>访客不能编辑或删除自己提交的留言。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>留言进入待审核列表；访客看到“留言已提交，审核通过后展示”；作者审核通过后留言按时间倒序出现在列表顶部。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>留言板关闭：显示“留言板暂时关闭”，隐藏表单，已有公开留言仍可浏览。</li>
+          <li>提交失败：保留输入并提示原因；频率限制时按钮进入倒计时。</li>
+          <li>无公开留言：展示空态“还没有留言，来坐坐吧”。</li>
+          <li>留言加载失败：列表区提示重试，表单仍可用。</li>
+        </ul>
+      </article>
+
+      <h3 id="s4-admin">后台模块 · FR-10—FR-18</h3>
+
+      <article class="fr" id="fr-10">
+        <div class="fr-head"><span class="fr-id">FR-10</span><h3>后台登录与账号安全</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">保证只有作者本人能进入后台，前台任何位置不暴露后台入口。</span></div>
+          <div><span class="k">Trigger</span><span class="v">管理员直接访问后台地址，或在会话失效后访问任一后台页面。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>登录页 <span class="mono">/admin/login</span>：用户名、密码两个字段；不提供注册、找回密码入口。</li>
+          <li>登录成功进入仪表盘；失败统一提示“账号或密码错误”，不区分具体原因。</li>
+          <li>连续 5 次失败锁定 10 分钟，锁定期间显示剩余时间。<span class="badge assume">假设</span></li>
+          <li>30 分钟无操作会话失效，再次访问后台跳转登录页并提示“登录已过期”。<span class="badge assume">假设</span></li>
+          <li>后台所有页面与操作均要求登录；未登录访问返回登录页，不暴露任何后台数据。</li>
+          <li>退出登录后立即失效并回到登录页；前台不展示“登录后台”入口。</li>
+          <li>密码修改在个人资料中完成，需校验旧密码；忘记密码由服务器运维处理。<span class="badge tbd">TBD</span></li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>只有持有正确账号密码的单一管理员能进入后台；登录失败与锁定对访问者可见，但不泄露账号信息。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>提交空字段：字段下方提示必填，不发起登录请求。</li>
+          <li>登录期间网络失败：保留输入，提示“登录失败，请稍后重试”。</li>
+          <li>锁定中刷新页面：仍展示剩余锁定时间，登录按钮不可用。</li>
+          <li>会话在表单编辑中失效：保存操作提示“登录已过期”，当前页面表单内容保留，重新登录后需再次提交。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-11">
+        <div class="fr-head"><span class="fr-id">FR-11</span><h3>仪表盘</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">登录后的第一屏，快速回答“有多少内容、有什么待处理、下一步做什么”。</span></div>
+          <div><span class="k">Trigger</span><span class="v">登录成功，或点击后台侧栏“仪表盘”。</span></div>
+        </div>
+        <div class="sub-label">Content</div>
+        <ul>
+          <li>统计卡：文章总数、已发布、草稿、已下线、待审核评论、待审核留言、累计浏览量。</li>
+          <li>最近发布 5 篇文章（标题、状态、发布时间、编辑入口）。</li>
+          <li>待处理 5 条评论/留言（昵称、摘要、来源文章、时间、审核入口）。</li>
+          <li>快捷操作：写文章、审核评论、站点配置、个人资料。</li>
+        </ul>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>文章总数包含草稿与已下线，不包含已删除；浏览量只统计已发布文章。</li>
+          <li>待审核数量为评论与留言待审核之和，任一为 0 时对应入口不显示数量气泡。</li>
+          <li>点击统计卡进入对应列表并自动带上筛选条件。</li>
+          <li>数字为进入页面时的实时值；执行审核或发布后返回仪表盘应重新加载。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>管理员在 1 屏内看到待审核压力与最近内容，并能一键进入处理页面。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>无文章：文章区展示“写第一篇文章”引导，不显示空表格。</li>
+          <li>无待审核：待处理区展示“暂无待处理内容”。</li>
+          <li>统计加载失败：对应卡片显示“—”，并提供刷新入口，其余卡片正常。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-12">
+        <div class="fr-head"><span class="fr-id">FR-12</span><h3>文章管理</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">作者无需改代码即可完成文章从创建到下线、删除的全部维护动作。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“文章”、仪表盘“写文章”或最近文章编辑入口。</span></div>
+        </div>
+        <div class="sub-label">List</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/posts</span>：状态标签页（全部 / 已发布 / 草稿 / 已下线）、标题搜索、分类筛选、按更新时间倒序、每页 10 条。</li>
+          <li>列：标题、分类、标签、状态、发布时间、浏览量、操作。</li>
+          <li>操作：编辑、预览、发布/下线、置顶/取消置顶、删除。</li>
+          <li>标题搜索对当前状态标签页内生效；筛选条件在分页间保留，可一键清空。</li>
+        </ul>
+        <div class="sub-label">Editor</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/posts/new</span> 与 <span class="mono">/admin/posts/:id/edit</span>。</li>
+          <li>左侧：标题输入、Markdown 编辑器、工具栏（粗体、标题、链接、图片、代码、预览切换）。</li>
+          <li>右侧设置面板：状态、分类、标签、封面、摘要、slug、允许评论、置顶。</li>
+          <li>底部操作：保存草稿、预览、发布/更新；新建默认“草稿”。</li>
+          <li>草稿只要求标题，可暂不选分类、不填正文；发布时校验标题、正文、分类与 slug 唯一性。</li>
+          <li>摘要为空时自动取正文纯文本前 120 字；slug 为空时自动生成，冲突时自动追加序号。</li>
+          <li>预览使用前台文章样式，不计数浏览量、不展示评论区；草稿预览仅管理员可见。</li>
+          <li>首次发布写入发布时间；下线后重新发布不改变首次发布时间。</li>
+        </ul>
+        <div class="sub-label">Destructive actions</div>
+        <ul>
+          <li>下线立即生效，前台详情变为 404；评论保留，重新发布后恢复展示。</li>
+          <li>删除为不可逆操作：弹窗展示文章标题与评论数量，要求输入完整标题后才可确认删除，文章及其评论一并删除。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>保存草稿后列表状态为“草稿”；发布后文章出现在首页、列表、分类/标签页、搜索与归档，并按首次发布时间排序。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>发布校验失败：定位到第一个错误字段并提示，草稿状态不变。</li>
+          <li>保存失败：保留全部已输入内容，提示重试；不自动关闭页面。</li>
+          <li>存在未保存修改时离开页面或刷新：弹出确认提示。</li>
+          <li>封面/头像上传失败：保留其余字段，提示重新上传，不阻止草稿保存。</li>
+          <li>编辑已被删除的文章：列表刷新后该条消失，编辑页返回列表并提示。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-13">
+        <div class="fr-head"><span class="fr-id">FR-13</span><h3>分类与标签管理</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">维持前台导航与筛选口径的一致，避免删除分类导致文章失去归属。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“分类标签”，或文章编辑器中的“管理分类/标签”入口。</span></div>
+        </div>
+        <div class="sub-label">Category</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/taxonomy</span>，分类与标签两个标签页。</li>
+          <li>分类列表：名称、slug、描述、文章数（含草稿与已下线）、排序、操作。</li>
+          <li>新建/编辑：名称 2—20 字且唯一，slug 自动生成且唯一，描述 ≤100 字，排序 0—999（数字越小越靠前）。</li>
+          <li>分类下文章数大于 0 时禁止删除，提示“该分类下有 N 篇文章（含草稿），请先转移或删除文章”。</li>
+          <li>P0 不提供批量转移分类；P1 增加迁移能力。</li>
+        </ul>
+        <div class="sub-label">Tag</div>
+        <ul>
+          <li>标签列表：名称、slug、文章数、操作；支持新建、编辑、删除。</li>
+          <li>删除标签需二次确认，删除后自动从所有文章解除关联，文章本身不受影响。</li>
+          <li>标签合并为 P1；当前只支持逐个删除。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>前台分类导航、分类页、标签页与后台数据保持一致；无已发布文章的分类与标签不出现在前台入口。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>名称或 slug 重复：保存时在字段下方提示，不写入。</li>
+          <li>删除分类被阻止：弹窗说明文章数量与处理方式，不执行删除。</li>
+          <li>删除标签后仍有请求访问旧标签页：前台返回 404 并提供标签总览。</li>
+          <li>保存失败：保留表单内容并提示重试。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-14">
+        <div class="fr-head"><span class="fr-id">FR-14</span><h3>评论审核</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">让作者在公开前检查每一条评论，并在通过后进行回复。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“评论”、仪表盘待审核卡片或待处理列表。</span></div>
+        </div>
+        <div class="sub-label">List</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/comments</span>：标签页待审核 / 已通过 / 已驳回 / 全部；按提交时间倒序，每页 10 条。</li>
+          <li>每条显示昵称、邮箱、内容、所属文章（可点击预览）、提交时间、状态、操作。</li>
+          <li>支持按昵称/内容搜索、按文章筛选；筛选条件在分页间保留。</li>
+          <li>待审核数量显示在侧栏与仪表盘，处理完一条后数字实时减少。</li>
+        </ul>
+        <div class="sub-label">Actions</div>
+        <ul>
+          <li>通过：待审核或已驳回 → 已通过；前台立即公开；操作后提示成功。</li>
+          <li>驳回：待审核或已通过 → 已驳回；已通过内容立即从前台消失。</li>
+          <li>删除：任意状态 → 已删除，必须二次确认，删除后不可恢复。</li>
+          <li>回复：仅已通过评论可回复，内容 1—500 字；回复以后台“博主”身份展示，不触发审核，可多条。</li>
+          <li>批量通过、批量驳回为 P1；P0 只支持单条处理。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>审核结果直接影响前台评论列表与评论数；已通过评论可继续回复；被驳回内容不公开但保留在后台可复查。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>操作失败：状态回滚到操作前，并提示重试。</li>
+          <li>评论所属文章已下线：仍可在后台审核与回复，前台文章恢复后评论同步展示。</li>
+          <li>评论所属文章已删除：该评论已随文章一并删除，列表不再展示。</li>
+          <li>当前标签页无数据：显示对应空态，不显示空白表格。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-15">
+        <div class="fr-head"><span class="fr-id">FR-15</span><h3>留言管理</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">集中处理留言板的匿名内容，与评论使用一致的审核口径。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“留言”、仪表盘待审核留言卡片。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/messages</span>：标签页待审核 / 已通过 / 已驳回 / 全部；按提交时间倒序，每页 10 条。</li>
+          <li>每条显示昵称、邮箱、内容、提交时间、状态、操作；支持昵称/内容搜索。</li>
+          <li>操作与评论一致：通过、驳回、删除（二次确认）、回复（仅已通过，1—500 字）。</li>
+          <li>留言与评论独立计数，互不影响；仪表盘分别展示待审核数量。</li>
+          <li>留言不关联文章，因此不提供文章筛选，也不受文章删除影响。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>通过后留言按提交时间倒序出现在留言板顶部；回复展示在留言下方并标识“博主”；驳回或删除后前台立即不可见。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>留言板在前台被关闭：后台仍可审核现有留言，回复不会让留言板自动重新开放。</li>
+          <li>操作失败：状态回滚并提示重试。</li>
+          <li>无数据：按当前标签页展示空态。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-16">
+        <div class="fr-head"><span class="fr-id">FR-16</span><h3>友链管理</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">让作者自行维护前台友链列表，不再依赖代码改动。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“友链”，或前台友链页的“管理友链”入口（仅登录后可见）。</span></div>
+        </div>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/links</span>：列表展示头像、名称、URL、描述、排序、显示状态、操作。</li>
+          <li>新建/编辑字段：名称 2—30 字必填；URL 必填且只允许 http/https；描述 ≤100 字；头像选填（上传 ≤2MB）；排序 0—999；显示开关。</li>
+          <li>排序值越小越靠前；排序值相同按创建时间升序。</li>
+          <li>删除需二次确认，删除后前台立即移除；隐藏只影响前台展示，不删除数据。</li>
+          <li>P0 不支持拖拽排序与访客自助申请，均由 P1 提供。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>前台友链页按照后台顺序展示“显示”状态的友链；修改后前台下次加载即生效。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>URL 非法：保存时阻止并提示“请输入以 http:// 或 https:// 开头的地址”。</li>
+          <li>头像上传失败：保留其他字段，提示重新上传，不阻止保存文字信息。</li>
+          <li>无友链：展示空态与“新增友链”按钮。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-17">
+        <div class="fr-head"><span class="fr-id">FR-17</span><h3>站点配置</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">集中维护全站级信息与功能开关，避免前台出现硬编码文案。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“站点配置”，或仪表盘快捷操作。</span></div>
+        </div>
+        <div class="sub-label">Groups</div>
+        <ul>
+          <li><strong>基本信息</strong>：站点名称（2—30 字必填）、副标题（≤40 字）、站点描述（≤120 字）、Logo、作者昵称（2—20 字）、建站日期、备案号（≤50 字）。</li>
+          <li><strong>首页</strong>：公告内容（≤200 字）与公告开关。</li>
+          <li><strong>功能开关</strong>：评论开关、评论需审核（默认开）、留言板开关、搜索开关、附件下载开关（P1）。</li>
+          <li><strong>社交链接</strong>：平台名称、URL、排序、显示开关，最多 10 条。</li>
+          <li><strong>页脚</strong>：版权文案（≤100 字）。</li>
+        </ul>
+        <div class="sub-label">Rules</div>
+        <ul>
+          <li>站点名称为空时阻止保存并定位字段；其他字段为空时保存为“未设置”，前台隐藏对应模块。</li>
+          <li>URL 只允许 http/https；社交链接按排序值升序展示。</li>
+          <li>保存为整体提交：校验失败时不写入任何字段，保留用户已填内容。</li>
+          <li>关闭评论开关：所有文章详情隐藏评论表单与评论区，既有评论数据保留；重新开启后恢复展示。</li>
+          <li>关闭搜索开关：前台隐藏搜索入口，直接访问搜索页展示“搜索功能已关闭”。</li>
+          <li>配置保存后，前台下次加载生效；不承诺实时推送。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>站点名称、公告、页脚、社交链接、功能开关在前台对应位置生效，未填写项不产生空白占位。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>保存失败：停留在当前分组，提示错误并保留内容。</li>
+          <li>公告为空但开关开启：前台不展示公告条，后台提示“公告为空”。</li>
+          <li>社交链接超过 10 条：阻止新增并提示上限。</li>
+        </ul>
+      </article>
+
+      <article class="fr" id="fr-18">
+        <div class="fr-head"><span class="fr-id">FR-18</span><h3>个人资料与密码</h3><span class="spacer"></span><span class="badge p0">P0</span></div>
+        <div class="kv">
+          <div><span class="k">Purpose</span><span class="v">维护“关于我”页面的作者信息，并提供唯一的密码修改入口。</span></div>
+          <div><span class="k">Trigger</span><span class="v">后台侧栏“个人资料”，或右上角账号菜单。</span></div>
+        </div>
+        <div class="sub-label">Profile</div>
+        <ul>
+          <li>页面 <span class="mono">/admin/profile</span>：头像上传、昵称（2—20 字）、一句话简介（≤60 字）、技能标签（≤8 个，每个 2—12 字）、关于我正文（Markdown，≤20000 字）。</li>
+          <li>头像支持 jpg/png/webp，≤2MB；上传失败时保留原头像与其他字段。</li>
+          <li>昵称、简介、技能、正文保存后，前台关于我页面下次加载生效。</li>
+          <li>提供“预览关于我”入口，使用前台样式打开。</li>
+        </ul>
+        <div class="sub-label">Password</div>
+        <ul>
+          <li>修改密码需填写旧密码、新密码、确认新密码；新密码 8—32 位且同时包含字母与数字。<span class="badge assume">假设</span></li>
+          <li>旧密码错误或两次新密码不一致时阻止提交，并在对应字段提示。</li>
+          <li>修改成功后当前会话立即失效，跳转登录页并提示“密码已修改，请重新登录”。</li>
+        </ul>
+        <div class="sub-label">Result</div>
+        <p>关于我页面展示最新的作者资料；密码修改后旧密码无法再登录，必须使用新密码重新进入后台。</p>
+        <div class="sub-label">Exceptions</div>
+        <ul>
+          <li>资料保存失败：保留表单内容并提示重试。</li>
+          <li>正文超长：阻止保存并提示字数上限。</li>
+          <li>未修改任何字段就保存：提示“没有需要保存的修改”，不发起请求。</li>
+          <li>修改密码时登录失效：跳转登录页，已填写内容不保留（安全考虑）。</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ===================== 05 ===================== -->
+    <section class="doc-section" id="s5">
+      <div class="sec-head"><span class="sec-num">05</span><h2>共享规则与异常</h2></div>
+      <p class="lead">以下规则被多个模块引用，只在此处定义一次。模块内出现冲突时，以本节为准。</p>
+
+      <h3>5.1 分页、排序与计数</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>场景</th><th>规则</th></tr></thead>
+          <tbody>
+            <tr><td>前台文章列表 / 分类 / 标签 / 搜索</td><td>每页 10 条，按首次发布时间倒序；搜索标题命中优先</td></tr>
+            <tr><td>归档</td><td>年份倒序 → 月份倒序 → 文章发布时间倒序</td></tr>
+            <tr><td>后台文章列表</td><td>每页 10 条，默认按更新时间倒序</td></tr>
+            <tr><td>后台评论 / 留言</td><td>每页 10 条，按提交时间倒序</td></tr>
+            <tr><td>前台评论列表</td><td>按提交时间正序；回复按时间正序嵌套</td></tr>
+            <tr><td>首页最新文章</td><td>按首次发布时间倒序，最多 6 篇</td></tr>
+            <tr><td>评论数</td><td>只统计“已通过”评论；回复不计入评论数</td></tr>
+            <tr><td>浏览量</td><td>详情页加载计数；同一访客同文章 30 分钟内不重复<span class="badge assume">假设</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5.2 文本与字段校验</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>字段</th><th>规则</th><th>校验时机</th></tr></thead>
+          <tbody>
+            <tr><td>站点名称</td><td>必填，2—30 字</td><td>站点配置保存</td></tr>
+            <tr><td>文章标题</td><td>必填，2—80 字</td><td>草稿保存 / 发布</td></tr>
+            <tr><td>文章正文</td><td>发布时必填</td><td>发布</td></tr>
+            <tr><td>文章摘要</td><td>≤200 字</td><td>保存 / 发布</td></tr>
+            <tr><td>分类 / 标签名称</td><td>2—20 字，不可重名</td><td>分类标签保存</td></tr>
+            <tr><td>昵称</td><td>必填，2—20 字，允许重复</td><td>评论 / 留言提交</td></tr>
+            <tr><td>邮箱</td><td>选填，≤100 字符，需符合邮箱格式</td><td>评论 / 留言提交</td></tr>
+            <tr><td>评论内容</td><td>5—500 字，纯文本</td><td>评论提交</td></tr>
+            <tr><td>留言内容</td><td>5—300 字，纯文本</td><td>留言提交</td></tr>
+            <tr><td>博主回复</td><td>1—500 字</td><td>后台回复</td></tr>
+            <tr><td>友链名称 / URL</td><td>名称 2—30 字；URL 必填且为 http/https</td><td>友链保存</td></tr>
+            <tr><td>密码</td><td>8—32 位，含字母与数字</td><td>修改密码</td></tr>
+            <tr><td>头像 / 图片</td><td>jpg / png / webp，≤2MB</td><td>上传时</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5.3 匿名互动与防滥用</h3>
+      <ul>
+        <li>评论与留言均需完成一次轻量人机校验；校验失败不消耗提交次数。<span class="badge assume">假设</span></li>
+        <li>同一浏览器 60 秒内只能提交一条评论或留言；同一 IP 10 分钟内最多 3 条。<span class="badge assume">假设</span></li>
+        <li>提交内容只接受纯文本，HTML 标签按文本转义展示；文章正文中的脚本不得执行。</li>
+        <li>昵称允许重复，不作为身份凭证；邮箱不公开、不用于前台展示。</li>
+        <li>敏感词过滤为 P1；当前由作者人工审核兜底。</li>
+        <li>发现垃圾内容时作者可驳回或删除；删除为最终处理，不保留前台入口。</li>
+      </ul>
+
+      <h3>5.4 空态、加载与错误</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>场景</th><th>表现</th></tr></thead>
+          <tbody>
+            <tr><td>列表加载中</td><td>骨架屏占位，不显示空白列表</td></tr>
+            <tr><td>列表为空</td><td>空态文案 + 下一步入口（返回列表 / 写第一篇文章 / 浏览其他分类）</td></tr>
+            <tr><td>区块加载失败</td><td>该区块显示错误提示与“重试”，其余区块不受影响</td></tr>
+            <tr><td>表单提交失败</td><td>保留已填内容，字段级错误就近展示，整体错误用顶部提示</td></tr>
+            <tr><td>文章不存在 / 草稿 / 已下线</td><td>统一 404 页面，提供返回文章列表</td></tr>
+            <tr><td>未登录访问后台</td><td>跳转登录页，登录成功后回到原目标页</td></tr>
+            <tr><td>会话失效</td><td>提示“登录已过期”，跳转登录页</td></tr>
+            <tr><td>图片加载失败</td><td>占位图 + 替代文本，保持原有版式</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5.5 删除与不可逆操作</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>操作</th><th>确认方式</th><th>后果</th></tr></thead>
+          <tbody>
+            <tr><td>删除文章</td><td>弹窗展示标题与评论数，需输入完整标题确认</td><td>文章与全部评论删除，前台立即不可访问，不可恢复</td></tr>
+            <tr><td>删除评论 / 留言</td><td>二次确认弹窗</td><td>从前台与后台列表移除，不可恢复</td></tr>
+            <tr><td>删除友链</td><td>二次确认弹窗</td><td>前台立即移除，不可恢复</td></tr>
+            <tr><td>删除分类</td><td>先检查文章数</td><td>有文章时禁止；无文章时二次确认后删除</td></tr>
+            <tr><td>删除标签</td><td>二次确认弹窗</td><td>解除所有文章关联，文章保留</td></tr>
+            <tr><td>下线文章</td><td>二次确认弹窗</td><td>前台 404，数据与评论保留，可重新发布</td></tr>
+            <tr><td>修改密码</td><td>旧密码校验</td><td>当前会话失效，需重新登录</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5.6 时间与展示口径</h3>
+      <ul>
+        <li>所有时间按 Asia/Shanghai（UTC+8）展示。</li>
+        <li>发布时间 7 天内显示相对时间（如“3 天前”），超过 7 天显示 <span class="mono">YYYY-MM-DD</span>；评论与留言显示到分钟。</li>
+        <li>文章详情同时显示首次发布时间与最后更新时间；更新时间与发布时间同一天时不重复展示。</li>
+        <li>归档与后台列表中的日期使用 <span class="mono">YYYY-MM-DD</span>，时间使用 <span class="mono">YYYY-MM-DD HH:mm</span>。</li>
+      </ul>
+
+      <h3>5.7 草稿与隐私边界</h3>
+      <ul>
+        <li>草稿与已下线文章不出现在首页、列表、分类、标签、搜索、归档、RSS 与任何公开接口。</li>
+        <li>草稿预览仅管理员登录后可用，预览页不进入任何公开索引。</li>
+        <li>待审核与已驳回的评论/留言不出现在前台，也不出现在前台计数中。</li>
+        <li>访客邮箱只在后台可见，前台任何位置不展示，也不通过接口返回。</li>
+      </ul>
+    </section>
+
+    <!-- ===================== 06 ===================== -->
+    <section class="doc-section" id="s6">
+      <div class="sec-head"><span class="sec-num">06</span><h2>开放问题</h2></div>
+      <p class="lead">以下问题会改变范围或验收口径，需在评审时确认。未确认前，按“当前处理”执行并在原型中保持一致。</p>
+      <div class="qa">
+        <div class="qa-row head"><div>ID</div><div>问题</div><div>当前处理</div></div>
+        <div class="qa-row"><div class="id">Q1</div><div class="q">“查看下载”具体指什么？</div><div class="a">当前按“文章附件免登录下载（P1）”假设；若指文章导出 PDF，需单独定义导出范围与排版。</div></div>
+        <div class="qa-row"><div class="id">Q2</div><div class="q">评论审核是否允许关闭？</div><div class="a">默认开启，站点配置可关闭；关闭后新评论直接公开，存量待审核不自动通过。</div></div>
+        <div class="qa-row"><div class="id">Q3</div><div class="q">是否需要邮件通知与订阅？</div><div class="a">列为 P1，服务商与模板待定；P0 只在后台展示待审核数量。</div></div>
+        <div class="qa-row"><div class="id">Q4</div><div class="q">阅读量是否公开展示？按什么口径统计？</div><div class="a">当前公开展示，按详情页加载计数并对 30 分钟内重复访问去重 <span class="badge assume">假设</span>。</div></div>
+        <div class="qa-row"><div class="id">Q5</div><div class="q">站点是否需要备案号、域名与部署环境？</div><div class="a">页脚预留备案号字段；域名与部署方式不在本文定义 <span class="badge tbd">TBD</span>。</div></div>
+        <div class="qa-row"><div class="id">Q6</div><div class="q">是否需要全站明暗主题切换？</div><div class="a">当前只做暗色科技风单主题；主题切换列为后续可选项，不进入 P0。</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="footer">
+  <span>个人博客系统 · 需求文档 · v1.0</span>
+  <span>2026-10-30 · 待评审 · 配套《原型说明书》</span>
+</footer>
+
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  function setActive(id){
+    links.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === '#' + id); });
+  }
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) setActive(e.target.id); });
+    }, {rootMargin:'-18% 0px -72% 0px'});
+    targets.forEach(function(t){ io.observe(t); });
+  }
+  links.forEach(function(a){
+    a.addEventListener('click', function(){ setActive(a.getAttribute('href').slice(1)); });
+  });
+})();
+</script>
+</body>
+</html>

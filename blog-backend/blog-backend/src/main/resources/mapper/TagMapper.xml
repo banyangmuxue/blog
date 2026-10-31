@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blog.blogbackend.mapper.TagMapper">
+
+    <select id="selectTagList" resultType="com.blog.blogbackend.vo.TagVO">
+        SELECT t.slug,
+               t.name,
+               (SELECT COUNT(*)
+                FROM post_tag pt
+                JOIN post p ON p.id = pt.post_id
+                WHERE pt.tag_id = t.id
+                  AND p.status = 'published') AS count
+        FROM tag t
+        ORDER BY count DESC, t.name ASC
+    </select>
+
+    <select id="selectIdsBySlugs" resultType="long">
+        SELECT id
+        FROM tag
+        WHERE slug IN
+        <foreach collection="slugs" item="slug" open="(" separator="," close=")">
+            #{slug}
+        </foreach>
+    </select>
+
+    <select id="selectTagsByPostIds" resultType="com.blog.blogbackend.dto.PostTagRow">
+        SELECT pt.post_id,
+               t.slug,
+               t.name
+        FROM post_tag pt
+        JOIN tag t ON t.id = pt.tag_id
+        WHERE pt.post_id IN
+        <foreach collection="postIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY t.name ASC
+    </select>
+
+</mapper>
