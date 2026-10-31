@@ -1,0 +1,11 @@
+{
+  "installCommand": "npm --prefix blog-frontend install",
+  "buildCommand": "npm --prefix blog-frontend run build:demo",
+  "outputDirectory": "blog-frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
