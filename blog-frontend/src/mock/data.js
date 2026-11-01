@@ -1,3 +1,5 @@
+const demoCover = (slug) => `${process.env.BASE_URL}demo/covers/${slug}.jpg`
+
 export const siteConfig = {
   name: 'B/ 记录代码与生活',
   shortName: 'B/',
@@ -116,7 +118,7 @@ export const posts = [
     views: 1204,
     pinned: true,
     status: 'published',
-    cover: { from: '#123043', to: '#2a1b4d' },
+    cover: { from: '#123043', to: '#2a1b4d', image: demoCover('hello-blog-v2') },
     content: `
 ## 先写一句能被反驳的话
 
@@ -168,7 +170,7 @@ export const posts = [
     views: 986,
     pinned: true,
     status: 'published',
-    cover: { from: '#0d3b46', to: '#101a3f' },
+    cover: { from: '#0d3b46', to: '#101a3f', image: demoCover('vue3-performance') },
     content: `
 ## 现象：滚动时掉帧
 
@@ -232,7 +234,7 @@ window.addEventListener('scroll', () => {
     views: 842,
     pinned: true,
     status: 'published',
-    cover: { from: '#1b2b4d', to: '#0c333a' },
+    cover: { from: '#1b2b4d', to: '#0c333a', image: demoCover('springboot-api-design') },
     content: `
 ## 约定比实现更重要
 
@@ -288,7 +290,7 @@ window.addEventListener('scroll', () => {
     views: 630,
     pinned: false,
     status: 'published',
-    cover: { from: '#153a3a', to: '#241a3f' },
+    cover: { from: '#153a3a', to: '#241a3f', image: demoCover('css-grid-layout') },
     content: `
 ## 为什么换成 Grid
 
@@ -340,7 +342,7 @@ Grid 不是"更高级的 flex"，它解决的是二维关系。页面级布局�
     views: 512,
     pinned: false,
     status: 'published',
-    cover: { from: '#1c2b45', to: '#3a1c45' },
+    cover: { from: '#1c2b45', to: '#3a1c45', image: demoCover('typescript-patterns') },
     content: `
 ## 让非法状态无法表示
 
@@ -393,7 +395,7 @@ const routes = {
     views: 468,
     pinned: false,
     status: 'published',
-    cover: { from: '#243018', to: '#0f2c3a' },
+    cover: { from: '#243018', to: '#0f2c3a', image: demoCover('jpa-pagination') },
     content: `
 ## 三种常见写法
 
@@ -433,7 +435,7 @@ const routes = {
     views: 390,
     pinned: false,
     status: 'published',
-    cover: { from: '#3a2a18', to: '#1a2340' },
+    cover: { from: '#3a2a18', to: '#1a2340', image: demoCover('reading-2026') },
     content: `
 ## 两本技术书
 
@@ -471,7 +473,7 @@ const routes = {
     views: 322,
     pinned: false,
     status: 'published',
-    cover: { from: '#1a2c3f', to: '#33203d' },
+    cover: { from: '#1a2c3f', to: '#33203d', image: demoCover('build-in-public') },
     content: `
 ## 完美主义的成本
 
@@ -511,7 +513,7 @@ const routes = {
     views: 705,
     pinned: false,
     status: 'published',
-    cover: { from: '#12303f', to: '#2c1a42' },
+    cover: { from: '#12303f', to: '#2c1a42', image: demoCover('http-cache') },
     content: `
 ## 缓存解决的是什么
 
@@ -565,7 +567,7 @@ ETag: "a1b2c3"
     views: 611,
     pinned: false,
     status: 'published',
-    cover: { from: '#1d2945', to: '#123a33' },
+    cover: { from: '#1d2945', to: '#123a33', image: demoCover('spring-security-session') },
     content: `
 ## 单账号也需要认真对待
 
@@ -607,7 +609,7 @@ ETag: "a1b2c3"
     views: 804,
     pinned: false,
     status: 'published',
-    cover: { from: '#2b2438', to: '#13303a' },
+    cover: { from: '#2b2438', to: '#13303a', image: demoCover('first-post') },
     content: `
 ## 前两次为什么停了
 
@@ -645,7 +647,7 @@ ETag: "a1b2c3"
     views: 566,
     pinned: false,
     status: 'published',
-    cover: { from: '#23303c', to: '#2a1c36' },
+    cover: { from: '#23303c', to: '#2a1c36', image: demoCover('dev-env-2024') },
     content: `
 ## 编辑器
 
